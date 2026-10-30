@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trackly — Free Expense, Habit & Life Tracker (Open Source)</title>
+<meta name="description" content="Trackly is a free, offline-first, all-in-one life tracker PWA with a Hinglish AI assistant. Open source, built with Next.js + Supabase.">
+<link rel="icon" href="https://raw.githubusercontent.com/cyberamxn/trackly-app/main/public/favicon-32x32.png">
+<link rel="canonical" href="https://trackly.today/">
+<style>
+  :root { color-scheme: dark; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #000; color: #fafafa; line-height: 1.6; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 48px 24px 64px; }
+  .logo { display: flex; align-items: center; gap: 14px; margin-bottom: 40px; }
+  .logo img { width: 48px; height: 48px; border-radius: 12px; }
+  .logo span { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  h1 { font-size: clamp(30px, 5vw, 46px); line-height: 1.15; letter-spacing: -1px; margin-bottom: 16px; }
+  .sub { font-size: 18px; color: #a3a3a3; max-width: 620px; margin-bottom: 28px; }
+  .cta { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 48px; }
+  .btn { display: inline-block; padding: 13px 26px; border-radius: 999px; font-weight: 600; font-size: 15px; text-decoration: none; }
+  .btn-primary { background: #fafafa; color: #000; }
+  .btn-ghost { border: 1px solid #333; color: #fafafa; }
+  .shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 48px; }
+  .shots img { width: 100%; border-radius: 16px; border: 1px solid #222; }
+  ul { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin-bottom: 48px; }
+  li { color: #d4d4d4; font-size: 15px; padding-left: 24px; position: relative; }
+  li::before { content: "—"; position: absolute; left: 0; color: #666; }
+  footer { border-top: 1px solid #222; padding-top: 24px; color: #737373; font-size: 14px; }
+  footer a { color: #d4d4d4; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">
+    <img src="https://raw.githubusercontent.com/cyberamxn/trackly-app/main/public/icon-192.png" alt="Trackly logo">
+    <span>Trackly</span>
+  </div>
+  <h1>One app for your whole life.</h1>
+  <p class="sub">Free, offline-first, all-in-one life tracker — expenses, habits, tasks, notes, split bills &amp; an AI that understands Hinglish. Open source, MIT licensed.</p>
+  <div class="cta">
+    <a class="btn btn-primary" href="https://trackly.today/">Open the App — trackly.today</a>
+    <a class="btn btn-ghost" href="https://github.com/cyberamxn/trackly-app">View Source on GitHub</a>
+  </div>
+  <div class="shots">
+    <img src="https://raw.githubusercontent.com/cyberamxn/trackly-app/main/docs/screenshots/landing.png" alt="Trackly landing page">
+    <img src="https://raw.githubusercontent.com/cyberamxn/trackly-app/main/docs/screenshots/dashboard.png" alt="Trackly dashboard">
+    <img src="https://raw.githubusercontent.com/cyberamxn/trackly-app/main/docs/screenshots/money.png" alt="Trackly money tracking">
+  </div>
+  <ul>
+    <li>Expenses, income, budgets &amp; borrow/lend (udhaar)</li>
+    <li>Habits, routines &amp; streaks</li>
+    <li>Tasks, notes &amp; shopping lists</li>
+    <li>Splitwise-style group expense splitting</li>
+    <li>Hinglish AI assistant — “add momo 70”</li>
+    <li>Installs in ~30 seconds, no app store</li>
+    <li>Works fully offline (PWA)</li>
+    <li>Student &amp; Office modes</li>
+  </ul>
+  <footer>
+    Trackly is a project by <a href="https://ahexa.studio">ahexa.studio</a> ·
+    <a href="https://trackly.today">trackly.today</a> ·
+    <a href="https://github.com/cyberamxn/trackly-app">Source (MIT)</a>
+  </footer>
+</div>
+</body>
+</html>
