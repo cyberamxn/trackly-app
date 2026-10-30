@@ -1,0 +1,557 @@
+// Trackly Admin Panel — Prisma Schema
+// Enterprise SaaS schema for managing the Trackly iOS app ecosystem
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===== Auth =====
+
+model AdminUser {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  name            String
+  passwordHash    String
+  role            String   @default("ADMIN") // SUPER_ADMIN | ADMIN | SUPPORT | MODERATOR
+  avatar          String?
+  twoFactorEnabled Boolean @default(false)
+  twoFactorSecret String?
+  status          String   @default("ACTIVE") // ACTIVE | SUSPENDED
+  lastLoginAt     DateTime?
+  lastLoginIp     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  auditLogs     AuditLog[]
+  sessions      AdminSession[]
+  tickets       SupportTicket[] @relation("AssignedTickets")
+  ticketReplies TicketReply[]
+}
+
+model AdminSession {
+  id           String   @id @default(cuid())
+  token        String   @unique
+  ipAddress    String
+  userAgent    String
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  admin        AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  adminId      String
+
+  @@index([adminId])
+}
+
+// ===== End Users (Trackly app users) =====
+
+model AppUser {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  name            String
+  avatar          String?
+  country         String   @default("IN")
+  deviceType      String   @default("iOS") // iOS | Android
+  appVersion      String   @default("2.4.1")
+  osVersion       String?
+  deviceModel     String?
+  status          String   @default("ACTIVE") // ACTIVE | SUSPENDED | BANNED | DELETED
+  premium         Boolean  @default(false)
+  premiumSince    DateTime?
+  premiumExpires  DateTime?
+  storageUsedMb   Float    @default(0)
+  storageLimitMb  Float    @default(500)
+  totalExpenses   Int      @default(0)
+  totalHabits     Int      @default(0)
+  totalNotes      Int      @default(0)
+  lastActiveAt    DateTime?
+  signupAt        DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  subscriptions   UserSubscription[]
+  loginHistory    UserLoginHistory[]
+  notificationLogs PushNotificationLog[]
+  tickets         SupportTicket[]
+  activities      ActivityEvent[]
+
+  @@index([email])
+  @@index([status])
+  @@index([premium])
+}
+
+model UserLoginHistory {
+  id           String   @id @default(cuid())
+  ipAddress    String
+  device       String
+  location     String?
+  success      Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  user         AppUser  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+
+  @@index([userId])
+}
+
+// ===== Subscriptions =====
+
+model Plan {
+  id              String   @id @default(cuid())
+  name            String
+  tier            String   @default("FREE") // FREE | PREMIUM | LIFETIME
+  billingPeriod   String   @default("MONTHLY") // MONTHLY | YEARLY | LIFETIME
+  priceCents      Int      @default(0)
+  currency        String   @default("INR")
+  features        String   @default("[]") // JSON array
+  trialDays       Int      @default(0)
+  active          Boolean  @default(true)
+  sortOrder       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  subscriptions   UserSubscription[]
+  coupons         Coupon[]
+
+  @@index([tier])
+}
+
+model UserSubscription {
+  id              String   @id @default(cuid())
+  status          String   @default("ACTIVE") // ACTIVE | CANCELED | EXPIRED | PAST_DUE | TRIALING
+  startedAt       DateTime @default(now())
+  canceledAt      DateTime?
+  currentPeriodEnd DateTime?
+  amountCents     Int
+  currency        String   @default("INR")
+  paymentMethod   String   @default("STRIPE")
+  transactionId   String?
+  couponCode      String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            AppUser  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String
+  plan            Plan     @relation(fields: [planId], references: [id])
+  planId          String
+
+  @@index([userId])
+  @@index([status])
+}
+
+model Coupon {
+  id              String   @id @default(cuid())
+  code            String   @unique
+  discountPercent Int      @default(10)
+  maxRedemptions  Int      @default(100)
+  redemptions     Int      @default(0)
+  expiresAt       DateTime?
+  active          Boolean  @default(true)
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  plan            Plan?    @relation(fields: [planId], references: [id])
+  planId          String?
+
+  @@index([code])
+}
+
+model Refund {
+  id              String   @id @default(cuid())
+  amountCents     Int
+  reason          String
+  status          String   @default("PENDING") // PENDING | APPROVED | COMPLETED | REJECTED
+  processedBy     String?  // admin id
+  subscriptionId  String?
+  userId          String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([status])
+}
+
+// ===== Feature Flags =====
+
+model FeatureFlag {
+  id              String   @id @default(cuid())
+  key             String   @unique
+  name            String
+  description     String?
+  enabled         Boolean  @default(false)
+  rolloutPercent  Int      @default(0) // 0-100
+  targetUsers     String   @default("[]") // JSON array of user ids (whitelist)
+  minAppVersion   String?
+  metadata        String   @default("{}") // JSON
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([key])
+  @@index([enabled])
+}
+
+// ===== Remote Config =====
+
+model RemoteConfig {
+  id              String   @id @default(cuid())
+  key             String   @unique
+  value           String   // stored as string, parsed on read
+  type            String   @default("STRING") // STRING | BOOLEAN | NUMBER | JSON
+  description     String?
+  updatedAt       DateTime @updatedAt
+
+  @@index([key])
+}
+
+// ===== Notifications =====
+
+model PushNotification {
+  id              String   @id @default(cuid())
+  title           String
+  body            String
+  target          String   @default("ALL") // ALL | PREMIUM | FREE | SELECTED | COUNTRY | VERSION | DEVICE
+  targetValue     String?  // JSON for selected users, or country code, etc.
+  scheduledAt     DateTime?
+  sentAt          DateTime?
+  status          String   @default("DRAFT") // DRAFT | SCHEDULED | SENT | FAILED
+  sentCount       Int      @default(0)
+  openedCount     Int      @default(0)
+  createdBy       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  logs            PushNotificationLog[]
+
+  @@index([status])
+}
+
+model PushNotificationLog {
+  id              String   @id @default(cuid())
+  delivered       Boolean  @default(false)
+  opened          Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  notification    PushNotification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  notificationId  String
+  user            AppUser  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String
+
+  @@index([notificationId])
+  @@index([userId])
+}
+
+// ===== Content =====
+
+model Content {
+  id              String   @id @default(cuid())
+  type            String   // CATEGORY | HABIT_TEMPLATE | SHOPPING_TEMPLATE | REMINDER_TEMPLATE | ONBOARDING_PAGE | FAQ | HELP_ARTICLE | TERMS | PRIVACY | ANNOUNCEMENT
+  key             String?
+  title           String
+  body            String   @default("")
+  metadata        String   @default("{}") // JSON: icon, color, sortOrder, etc.
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([type])
+  @@index([active])
+}
+
+// ===== Support =====
+
+model SupportTicket {
+  id              String   @id @default(cuid())
+  ticketNumber    String   @unique
+  userEmail       String
+  subject         String
+  body            String
+  status          String   @default("OPEN") // OPEN | IN_PROGRESS | RESOLVED | CLOSED
+  priority        String   @default("NORMAL") // LOW | NORMAL | HIGH | URGENT
+  category        String   @default("GENERAL")
+  internalNotes   String?
+  attachments     String   @default("[]") // JSON
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            AppUser?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId          String?
+  assignedTo      AdminUser? @relation("AssignedTickets", fields: [assignedToId], references: [id], onDelete: SetNull)
+  assignedToId    String?
+  replies         TicketReply[]
+
+  @@index([status])
+  @@index([priority])
+}
+
+model TicketReply {
+  id              String   @id @default(cuid())
+  authorType      String   @default("ADMIN") // ADMIN | USER | AI
+  body            String
+  createdAt       DateTime @default(now())
+  ticket          SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  ticketId        String
+  author          AdminUser? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorId        String?
+
+  @@index([ticketId])
+}
+
+// ===== Analytics / Activity =====
+
+model ActivityEvent {
+  id              String   @id @default(cuid())
+  eventType       String   // APP_OPEN | EXPENSE_LOGGED | HABIT_COMPLETED | NOTE_CREATED | SUBSCRIPTION_PURCHASED | etc.
+  screen          String?
+  metadata        String   @default("{}")
+  createdAt       DateTime @default(now())
+  user            AppUser?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId          String?
+
+  @@index([userId])
+  @@index([eventType])
+  @@index([createdAt])
+}
+
+// ===== Security / Audit =====
+
+model AuditLog {
+  id              String   @id @default(cuid())
+  action          String   // LOGIN | LOGOUT | CREATE_USER | UPDATE_USER | DELETE_USER | etc.
+  entityType      String?
+  entityId        String?
+  metadata        String   @default("{}")
+  ipAddress       String?
+  userAgent       String?
+  createdAt       DateTime @default(now())
+  admin           AdminUser? @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  adminId         String?
+
+  @@index([adminId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// ===== Integrations =====
+
+model Integration {
+  id              String   @id @default(cuid())
+  key             String   @unique // firebase | cloudkit | stripe | revenuecat | appstore | ga | crashlytics | sentry | onesignal | openai
+  name            String
+  connected       Boolean  @default(false)
+  config          String   @default("{}") // JSON: API keys, etc. (masked on read)
+  lastSyncedAt    DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([key])
+}
+
+// ===== System Settings =====
+
+model SystemSetting {
+  id              String   @id @default(cuid())
+  key             String   @unique
+  value           String
+  type            String   @default("STRING")
+  updatedAt       DateTime @updatedAt
+
+  @@index([key])
+}
+
+// ===================================================================
+// ===== GROUP EXPENSES & SMART BILL SPLITTER (Trackly app) =====
+// App users authenticate via Supabase JWT (verified per request in
+// /api/groups routes); their Supabase user id is stored here as `userId`.
+// All amounts are INTEGER minor units (paise/cents) — exact decimals.
+// ===================================================================
+
+model Group {
+  id          String   @id @default(cuid())
+  name        String
+  description String   @default("")
+  icon        String   @default("🏠") // emoji shown as group avatar
+  type        String   @default("friends") // roommates | travel | friends | household | trip | other
+  currency    String   @default("INR")
+  createdBy   String // supabase user id of creator
+  archived    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members     GroupMember[]
+  invitations GroupInvitation[]
+  expenses    GroupExpense[]
+  settlements GroupSettlement[]
+  activities  GroupActivity[]
+
+  @@index([createdBy])
+}
+
+model GroupMember {
+  id       String   @id @default(cuid())
+  groupId  String
+  userId   String // supabase user id
+  role     String   @default("member") // admin | member
+  status   String   @default("active") // active | removed | left
+  joinedAt DateTime @default(now())
+  group    Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@index([userId])
+  @@index([groupId, status])
+}
+
+model GroupInvitation {
+  id                String    @id @default(cuid())
+  groupId           String
+  invitedUserId     String // supabase user id (resolved from username/email at invite time)
+  invitedIdentifier String // what the admin actually typed (username or email)
+  invitedBy         String // supabase user id (admin who invited)
+  status            String    @default("pending") // pending | accepted | declined | cancelled
+  createdAt         DateTime  @default(now())
+  respondedAt       DateTime?
+  group             Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, invitedUserId])
+  @@index([invitedUserId, status])
+  @@index([groupId, status])
+}
+
+model GroupExpense {
+  id          String    @id @default(cuid())
+  groupId     String
+  title       String
+  amountPaise Int // integer minor units — exact
+  currency    String    @default("INR")
+  category    String    @default("other")
+  paidBy      String // supabase user id
+  expenseDate String // YYYY-MM-DD
+  notes       String    @default("")
+  splitMethod String    @default("equal") // equal | unequal | percentage | shares
+  createdBy   String
+  deletedAt   DateTime? // soft delete — audit trail preserved
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  group       Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  splits      GroupExpenseSplit[]
+
+  @@index([groupId, expenseDate])
+  @@index([paidBy])
+}
+
+model GroupExpenseSplit {
+  id          String        @id @default(cuid())
+  expenseId   String
+  userId      String
+  amountPaise Int // this participant's share of the expense
+  shares      Int           @default(1) // share weight (used by share-based split)
+  expense     GroupExpense  @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+
+  @@unique([expenseId, userId])
+  @@index([userId])
+}
+
+model GroupSettlement {
+  id          String    @id @default(cuid())
+  groupId     String
+  fromUserId  String // payer
+  toUserId    String // receiver
+  amountPaise Int
+  status      String    @default("pending") // pending | confirmed | rejected
+  note        String    @default("")
+  createdBy   String
+  confirmedBy String?
+  confirmedAt DateTime?
+  createdAt   DateTime  @default(now())
+  group       Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([groupId, status])
+}
+
+model GroupActivity {
+  id        String   @id @default(cuid())
+  groupId   String
+  userId    String // supabase user id of actor
+  type      String // group_created | member_joined | member_left | member_removed | invited | invite_accepted | invite_declined | invite_cancelled | expense_added | expense_updated | expense_deleted | settlement_recorded | settlement_confirmed | settlement_rejected | admin_transferred | group_edited | group_archived | group_reopened
+  text      String // pre-composed human-readable line
+  createdAt DateTime @default(now())
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([groupId, createdAt])
+}
+
+// ===== Admin-granted Premium (engine 29) =====
+// Granted per Supabase user from the Admin Panel (Users → drawer →
+// Grant premium). Premium = no limits (daily AI quota is fully
+// bypassed — currently the only enforced user-facing limit; referral
+// device/IP caps & invite throttles are anti-fraud and stay).
+// Table is created at runtime by ensurePremiumTable() (idempotent DDL,
+// same pattern as AiUsage); runtime queries are RAW SQL — no
+// prisma-generate dependency for deploys.
+model PremiumUser {
+  id        String   @id @default(cuid())
+  userId    String   @unique // supabase user id
+  note      String? // optional admin note (e.g. "beta tester")
+  since     DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ===== AI Usage Limits (Claude-style daily quota) =====
+// One row per (user, usage-day). The usage-day boundary is 04:00 IST
+// (off-peak reset — nobody can game a midnight edge), the day key is
+// computed server-side. Enforcement is ATOMIC at the DB level:
+// UPDATE ... WHERE count < LIMIT (updateMany) — parallel requests can
+// never overshoot the limit.
+model AiUsage {
+  id        String   @id @default(cuid())
+  userId    String // supabase user id (auth verified by the route)
+  day       String // usage-day key YYYY-MM-DD (04:00 IST boundary)
+  count     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, day])
+  @@index([day])
+}
+
+// ===== Referral System (Invite & Earn) =====
+// Referrer gets +5 daily AI messages per COMPLETED referral (cap +30/day,
+// i.e. 30 → 60 max). Referee gets +10 on signup day (welcomeDayKey) and
+// +5 on the day the referral completes (rewardDayKey) — "dono ko fayda".
+// Anti-fraud: one referral row per referee account (unique refereeId),
+// claim window 48h from account creation, ≤2 referees per device,
+// ≤10 referees per IP (7-day window), self-referral blocked by
+// device match, completion requires REAL usage (first expense/task/
+// note/... — NOT seeded habits, and NOT a bare signup).
+// Tables are bootstrapped in prod by ensureReferralTables()
+// (/api/referrals/*) — same idempotent-DDL pattern as AiUsage.
+
+model ReferralCode {
+  id             String    @id @default(cuid())
+  code           String    @unique // 7-char unambiguous base32 (no 0/O/1/I)
+  userId         String    @unique // supabase user id of the code owner
+  lastDeviceHash String? // owner's latest device (self-referral check)
+  lastSeenAt     DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Referral {
+  id            String    @id @default(cuid())
+  code          String
+  referrerId    String // supabase user id who invited
+  refereeId     String    @unique // supabase user id who was invited
+  status        String    @default("PENDING") // PENDING | COMPLETED | REVOKED
+  deviceHash    String? // referee's device at claim time
+  ipHash        String? // referee's IP at claim time (review signal)
+  welcomeDayKey String? // usage-day key when claimed (referee +10 that day)
+  rewardDayKey  String? // usage-day key when completed (referee +5 that day)
+  createdAt     DateTime  @default(now())
+  completedAt   DateTime?
+
+  @@index([referrerId, status])
+  @@index([refereeId, welcomeDayKey])
+  @@index([refereeId, rewardDayKey])
+  @@index([deviceHash])
+  @@index([ipHash])
+}

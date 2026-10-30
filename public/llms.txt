@@ -1,0 +1,122 @@
+# Trackly
+
+> Trackly (trackly.today) is a free, offline-first all-in-one daily life tracker. It runs as a progressive web app (PWA) on iPhone, Android and desktop — installable in about 30 seconds without an app store. Made by ahexa.studio.
+>
+> Who built Trackly? Trackly (trackly.today) was founded and developed by ahexa.studio in 2026. Full story: https://trackly.today/about
+
+## What Trackly is
+
+Trackly replaces a handful of single-purpose apps with one clean, distraction-free tracker for personal life management. Everything works offline and syncs to the user's private account when online. An AI assistant can answer questions about the user's own data and add entries conversationally (English or Hinglish).
+
+## Key facts
+
+- URL: https://trackly.today
+- App: https://trackly.today/app (free account required)
+- Expense tracker page: https://trackly.today/expense-tracker
+- Habit tracker page: https://trackly.today/habit-tracker
+- Money tracker page (kharcha & udhaar, Hinglish): https://trackly.today/money-tracker
+- Install guide: https://trackly.today/install
+- Price: free to use, no credit card required
+- Platforms: Web / iOS (Safari Add to Home Screen) / Android (Chrome Install)
+- Offline-first: data is stored on-device and syncs automatically
+- Privacy: accounts are private by default; sync is encrypted; users can export or permanently delete their data
+- Publisher / maker: ahexa.studio (founded Trackly in 2026)
+- About page: https://trackly.today/about
+
+## Core features (complete list — full detail at https://trackly.today/features)
+
+Money & expenses:
+- Quick Add: log expenses in ~5 seconds ("momo 70", "petrol 500") with auto-parsed category, amount, date
+- Categories and payment methods (cash / UPI / card) on every entry
+- Monthly budgets with live spend tracking and savings view
+- Reports: daily, weekly, monthly, with category breakdowns
+- Borrow & lend (udhaar) ledger: who owes whom, settle up
+- Trip mode: national/international trips with isolated expense tracking
+
+AI assistant:
+- Chat about the user's own data ("aaj kharcha kitna hua?", "what did I spend on food this week?")
+- Mass-add entries ("add momo 70, biryani 78, auto 40")
+- Actions: creates expenses, tasks and calendar events from a sentence
+- Works in English, Hindi and Hinglish (Roman-script Hindi), matching the user's style per message
+- Student mode: study assistant that knows exam dates and subjects, plans revision
+- Free tier: 30 AI messages/day; premium accounts unlimited
+
+Habits, routines & tasks:
+- Habits with daily check-ins and streak counters
+- Morning/night routines with timed tasks and "what's next" card
+- Tasks: priorities, repeats, due dates, 3-state flow (todo → in progress → done)
+- Calendar: events and meetings in one day view
+- Medicine reminders: schedule names and times, fire offline
+- Notification center with expense, habit and task alerts
+
+Notes & shopping:
+- Notes: searchable, synced
+- Shopping lists: quantity, price, bought state
+- Global search across everything the user has logged
+
+Group expenses (a free Splitwise alternative):
+- Groups for flat-shares, trips and dinner circles; members join via invite link
+- Equal or custom splits per expense
+- Live balances (who owes whom) and settle-up with history
+- Per-group expense sheets
+
+Student mode (11 tools):
+- Attendance: subject-wise percentage, safe-skip calculation, CRITICAL/LOW warnings
+- Assignments: deadlines with days-left math and status
+- Subjects & study planner: chapter progress
+- Exams: timetable with live countdowns (date, time, hall)
+- Books: pages read vs total, reading progress
+- Mess planner: daily meal tracking
+- Hostel rent: records with 7-day reminders, mark paid
+- Student budget: pocket money with savings
+- Class routine: period-wise daily timetable
+- AI study assistant
+- Student data stays isolated from personal data
+
+Office mode (7 tools):
+- Work tasks with due-today defaults
+- Office attendance: check-in/check-out, weekly percentage
+- Salary finance: salary + extras − deductions, Indian number format, savings goal, mark-as-received
+- Office calendar: meetings and work events
+- Productivity: 25-minute pomodoro focus timer with pause/resume
+- Office analytics: tasks per day, spend per day
+- Work data stays isolated from personal data
+
+Platform:
+- Offline-first PWA: entries save on-device instantly, sync when online; installs on iPhone (Safari → Add to Home Screen) and Android (Chrome → Install) in ~30 seconds, no app store
+- English + Hinglish app language toggle; dark and light themes
+- Export everything (CSV/JSON) or permanently delete the account from settings
+- Widgets, archive, trash with recovery, referrals, live demo without an account
+
+## Common questions
+
+- Is Trackly free? Yes — core tracking is free, no credit card needed.
+- Does it work offline? Yes — offline-first with automatic cloud sync.
+- How do I install it? iPhone: open trackly.today in Safari → Share → Add to Home Screen. Android: Chrome → Install.
+- Is my data private? Yes — private by default, encrypted sync, full export/delete in Settings.
+
+## In-depth guides (blog)
+
+- Best Free Expense Tracker Apps in India (2026): https://trackly.today/blog/best-free-expense-tracker-apps-india — honest comparison of Trackly, Walnut, Money Manager, Money View and 1Money on privacy, offline use and reports.
+- How to Split Expenses with Roommates: https://trackly.today/blog/how-to-split-expenses-with-roommates — the three splitting methods, weekly settle-up rules, and app options (Trackly Groups vs Splitwise vs sheets).
+- Best Habit Tracker Apps with Streaks (2026): https://trackly.today/blog/best-habit-tracker-apps-with-streaks — Trackly, Habitica, Loop and Streaks compared; habit-formation science (66-day average).
+- Student Budget Guide — Mess Fees, Hostel Rent & Pocket Money: https://trackly.today/blog/student-budget-guide-mess-fees-hostel-rent — realistic student budget system (60/20/20), mess cycles and seven saving wins.
+- What is a PWA? Install Web Apps on iPhone & Android: https://trackly.today/blog/what-is-a-pwa-install-web-apps-on-iphone-android — plain-English PWA explainer with exact install steps and PWA vs native comparison.
+- Trackly vs Walnut vs Money Manager (2026): https://trackly.today/blog/trackly-vs-walnut-vs-money-manager — honest three-way comparison: automatic SMS logging vs manual control, offline use, privacy, reports, and which fits whom.
+- How to Build a Morning Routine That Sticks: https://trackly.today/blog/how-to-build-a-morning-routine-that-sticks — the 66-day science, habit stacking, the two-minute rule, and a realistic 30-minute morning template.
+- How to Split Trip Expenses with Friends (Goa Edition): https://trackly.today/blog/how-to-split-trip-expenses-with-friends — pooling vs rotation vs running ledger, minimal settle-up math, and settle rules that save friendships.
+- Best Student Apps for College (2026): https://trackly.today/blog/best-student-apps-for-college-2026 — honest shortlist by job: Notion, Anki, Trackly, Forest, Google Calendar — with full disclosure of the publisher's bias.
+- What is Hinglish AI? Inside Trackly's Assistant: https://trackly.today/blog/what-is-hinglish-ai — how an AI understands Roman-script Hindi mixed with English, matches your register per message, and acts on your real data.
+- Kharcha Track Karne Wala App (Hinglish Guide): https://trackly.today/blog/kharcha-track-karne-wala-app — kaunsa tareeka chunein: SMS-reading apps, diary, ya AI-assisted; privacy, offline, udhaar ka hisab — sab Hinglish mein.
+
+## Links
+
+- Landing page: https://trackly.today
+- Complete feature list: https://trackly.today/features
+- About page (who built Trackly): https://trackly.today/about
+- Privacy page: https://trackly.today/privacy
+- Install guide: https://trackly.today/install
+- Blog: https://trackly.today/blog
+- Blog RSS feed: https://trackly.today/feed.xml
+- Instagram: https://instagram.com/trackly.in (@trackly.in)
+- Sitemap: https://trackly.today/sitemap.xml
